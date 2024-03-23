@@ -17,8 +17,12 @@ Clique nos links abaixo para acessar rapidamente a seção desejada:
 - [Sobre](#sobre)
 - [Principais Funcionalidades](#principais-funcionalidades)
 - [Estrutura do Projeto](#estrutura-do-projeto)
-- [Dependências](#dependências)
-- [Como executar](#como-executar)
+- [Dependências [device]](#dependências-device)
+- [Dependências [server]](#dependências-server)
+- [Como executar [device]](#como-executar-device)
+- [Como executar [server]](#como-executar-server)
+- [Licença](#licença)
+- [Agradecimentos](#agradecimentos)
 
 ## Sobre
 Este projeto tem como objetivo desenvolver um sistema de reconhecimento facial utilizando um dispositivo embarcado (Arduino Nano 33 BLE Sense) e um servidor para armazenamento e processamento dos dados. O sistema é composto por duas partes: o dispositivo embarcado, que captura a imagem do rosto do usuário e a envia para o servidor, e o servidor, que recebe a imagem, extrai os embeddings do rosto e compara com os embeddings armazenados no banco de dados. O sistema foi desenvolvido utilizando Python e as bibliotecas OpenCV, DeepFace e FastAPI. A comunicação entre o dispositivo embarcado e o servidor é feita por Serial.
@@ -87,7 +91,7 @@ Socket
 - A pasta ``device`` contém os arquivos necessários para a execução do projeto no dispositivo embarcado (Arudino Nano 33 BLE Sense), com os arquivos de código-fonte e de configuração.
 - A pasta ``server`` contém os arquivos necessários para a execução do projeto no servidor, com os arquivos de código-fonte, arquivos estáticos (CSS, JS e imagens) e templates HTML, além de arquivos de configuração e utilitários.
 
-## Dependências [device]
+## Dependências Device
 
 As dependências necessárias para a execução do projeto no dispositivo embarcado são: 
 
@@ -106,7 +110,7 @@ Todas as dependências, exceto a biblioteca TensorFlowLite, podem ser instaladas
 
 Feito isso, todas as dependências necessárias estarão instaladas e o projeto poderá ser executado no dispositivo embarcado.
 
-## Dependências [server]
+## Dependências Server
 
 As dependências necessárias para a execução do projeto no servidor são:
 
@@ -126,14 +130,14 @@ Todas as dependências podem ser instaladas por meio do gerenciador de pacotes d
     $ pip install -r requirements.txt
 ```
 
-## Como executar [device]
+## Como executar Device
 
 Para executar o projeto no dispositivo embarcado, basta seguir os passos abaixo:
 
 1. Abra o arquivo ``device.ino`` na Arduino IDE.
 2. Compile o código e faça o upload para o dispositivo embarcado.
 
-## Como executar [server]
+## Como executar Server
 
 Para executar o projeto no servidor, basta seguir os passos abaixo:
 

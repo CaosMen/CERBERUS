@@ -72,10 +72,10 @@ class FastAPIApp:
                     matrix_image = convert_hex_to_maxtrix_image(data)
                     matrix_image = np.array(matrix_image, dtype=np.uint8)
 
-                    color_matrix_image = cv2.cvtColor(matrix_image, cv2.COLOR_GRAY2BGR)
+                    matrix_color_image = cv2.cvtColor(matrix_image, cv2.COLOR_GRAY2BGR)
 
                     try:
-                        result_deepface = DeepFace.represent(img_path=color_matrix_image, model_name="Facenet512")
+                        result_deepface = DeepFace.represent(img_path=matrix_color_image, model_name="Facenet512")
                         embedding = result_deepface[0]["embedding"]
                     except ValueError:
                         print_log("error", "No face detected.")
@@ -92,7 +92,7 @@ class FastAPIApp:
 
                     print_log("info", "User registered successfully.")
 
-                    image = Image.fromarray(color_matrix_image)
+                    image = Image.fromarray(matrix_color_image)
 
                     buffer = BytesIO()
                     image.save(buffer, format="PNG")
@@ -133,10 +133,10 @@ class FastAPIApp:
                     matrix_image = convert_hex_to_maxtrix_image(data)
                     matrix_image = np.array(matrix_image, dtype=np.uint8)
 
-                    color_matrix_image = cv2.cvtColor(matrix_image, cv2.COLOR_GRAY2BGR)
+                    matrix_color_image = cv2.cvtColor(matrix_image, cv2.COLOR_GRAY2BGR)
 
                     try:
-                        result_deepface = DeepFace.represent(img_path=color_matrix_image, model_name="Facenet512")
+                        result_deepface = DeepFace.represent(img_path=matrix_color_image, model_name="Facenet512")
                         current_embedding = result_deepface[0]["embedding"]
                     except ValueError:
                         print_log("error", "No face detected.")
@@ -171,7 +171,7 @@ class FastAPIApp:
                                 "embeddings": user_embeddings + [current_embedding]
                             })
 
-                            image = Image.fromarray(color_matrix_image)
+                            image = Image.fromarray(matrix_color_image)
 
                             buffer = BytesIO()
                             image.save(buffer, format="PNG")
@@ -221,6 +221,53 @@ class FastAPIApp:
                     print_log("info", "Image captured successfully.")
 
                     return JSONResponse(content={"image": base64_image})
+
+        @self.app.post("/capture-person", response_class=JSONResponse)
+        async def capture_person(request: Request):
+            print_log("info", "[POST] /capture-person")
+            print_log("info", "Connecting to serial port...")
+
+            communication = Communication()
+            communication.connect()
+
+            communication.write("capture-person\r\n")
+
+            print_log("info", "Capture command sent to serial port.")
+
+            while True:
+                data = communication.readline()
+
+                if data:
+                    if data.startswith("[ERROR]"):
+                        error = data.replace("[ERROR] ", "")
+
+                        print_log("error", "Error capturing image.")
+                        print_log("error", f"Error: {error}")
+
+                        return JSONResponse(status_code=400, content={"message": error.upper()})
+
+                    matrix_image = convert_hex_to_maxtrix_image(data)
+                    matrix_image = np.array(matrix_image, dtype=np.uint8)
+
+                    matrix_color_image = cv2.cvtColor(matrix_image, cv2.COLOR_GRAY2BGR)
+
+                    try:
+                        result_deepface = DeepFace.represent(img_path=matrix_color_image, model_name="Facenet512")
+                    except ValueError:
+                        print_log("error", "No face detected.")
+
+                        return JSONResponse(status_code=400, content={"message": "NO FACE DETECTED!"})
+
+                    image = Image.fromarray(matrix_color_image)
+
+                    buffer = BytesIO()
+                    image.save(buffer, format="PNG")
+
+                    base64_image = f"data:image/png;base64,{base64.b64encode(buffer.getvalue()).decode()}"
+
+                    print_log("info", "Image captured successfully.")
+
+                    return JSONResponse(content={"image": base64_image, "representation": result_deepface[0]})
 
 
 fastapi_app = FastAPIApp().app

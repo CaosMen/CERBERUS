@@ -54,7 +54,15 @@ class Communication:
         print_log("info", ", ".join(serial_ports_available))
 
     def write(self, data: str) -> None:
+        if not self.serial_connection:
+            print_log("error", "Serial connection not established.")
+            return
+
         self.serial_connection.write(data.encode("utf-8"))
 
     def readline(self) -> str:
+        if not self.serial_connection:
+            print_log("error", "Serial connection not established.")
+            return ""
+
         return self.serial_connection.readline().decode("utf-8").strip()

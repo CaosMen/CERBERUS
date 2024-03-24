@@ -159,6 +159,95 @@ function capture() {
   })
 }
 
-function quit() {
-  window.close();
+function capturePhoto() {
+  Swal.fire({
+    html: `
+      <div class="main-container" style="width: 100%;">
+        <h1 class="title-text">CAPTURE PERSON</h1>
+        <h6 class="subtitle-text">TAKE A PHOTO OF A PERSON</h6>
+        <div id="capture-container" class="transparent-container">
+          <h6 class="subtitle-text">CLICK THE BUTTON BELOW TO TAKE A PHOTO AND IDENTIFY THE PERSON...</h6>
+        </div>
+      </div>
+    `,
+    focusConfirm: false,
+    showCancelButton: true,
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    allowEnterKey: false,
+    showLoaderOnConfirm: true,
+    confirmButtonText: 'CAPTURE',
+    cancelButtonText: 'CANCEL',
+    preConfirm: async () => {
+      try {
+        const response = await axios.post('/capture-person');
+        const { data } = response;
+
+        const image = data.image;
+        const representation = data.representation;
+        
+        const { embedding, face_confidence, facial_area } = representation;
+
+        const createTable = (data) => {
+          let table = '';
+          for (let i = 0; i < data.length; i += 2) {
+            table += `
+              <tr>
+                <td>${data[i].toFixed(10)}</td>
+                <td>${data[i + 1].toFixed(10)}</td>
+              </tr>
+            `;
+          }
+
+          return table;
+        }
+
+        document.getElementById('capture-container').innerHTML = `
+          <canvas id="canvas" class="image-capture" width="176" height="144"></canvas>
+          <div class="scrollable">
+            <hr class="transparent-hr" style="margin-bottom: 1rem;">
+            <h6 class="subtitle-text" style="text-align: justify;">
+              FACIAL REPRESENTATION:
+            </h6>
+            <table class="table">
+              ${createTable(embedding)}
+            </table>
+            <h6 class="subtitle-text" style="text-align: justify;">
+              FACE CONFIDENCE:
+            </h6>
+            <hr class="transparent-hr" style="margin: 1rem 0;">
+            <h6 class="subtitle-text" style="text-align: justify;">
+              ${face_confidence}.
+            </h6>
+            <hr class="transparent-hr" style="margin-top: 1rem;">
+          </div>
+        `;
+        
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        const imageElement = new Image();
+        imageElement.src = image;
+
+        imageElement.onload = () => {
+          ctx.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
+
+          ctx.strokeStyle = 'rgb(255, 255, 255)';
+          ctx.lineWidth = 1;
+          
+          ctx.beginPath();
+          ctx.roundRect(facial_area.x, facial_area.y, facial_area.w, facial_area.h, 5);
+          ctx.stroke();
+        };
+      } catch (error) {
+        const { response } = error;
+
+        const message = response?.data?.message || 'SOMETHING WENT WRONG';
+
+        Swal.showValidationMessage(`<h6 class="subtitle-text">${message}</h6>`);
+      }
+
+      return false;
+    }
+  })
 }

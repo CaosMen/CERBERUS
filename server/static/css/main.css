@@ -108,3 +108,48 @@ html, body {
 
   width: 100%;
 }
+
+.scrollable {
+  padding-right: 0.5rem;
+
+  overflow-y: auto;
+
+  height: 100px;
+  width: 100%;
+}
+
+.table {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.table td {
+  font-size: 1.25rem;
+
+  text-align: center;
+
+  border-top: solid 1px #808080;
+  border-bottom: solid 1px #808080;
+
+  color: #808080;
+}
+
+.scrollable::-webkit-scrollbar-track {
+  border: solid 1px #808080;
+	border-radius: 10px;
+
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+}
+
+.scrollable::-webkit-scrollbar {
+	width: 12px;
+}
+
+.scrollable::-webkit-scrollbar-thumb {
+  border: solid 1px #808080;
+	border-radius: 10px;
+
+	box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+
+	background-color: #555;
+}
